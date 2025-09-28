@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZOZA - معرض الصور</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .gallery-item {
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            backdrop-filter: blur(10px);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        }
+        
+        .romantic-gradient {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+        }
+        
+        .heart-float {
+            animation: heartFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes heartFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .rose-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23fce4ec' fill-opacity='0.1'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zm0 0c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-12 shadow-lg rose-pattern">
+        <div class="container mx-auto px-6 text-center">
+            <div class="heart-float inline-block text-6xl mb-4">💕</div>
+            <h1 class="text-5xl font-bold mb-4 fade-in text-pink-800">ZOZA</h1>
+            <p class="text-xl opacity-90 fade-in text-pink-700">💖 معرض الذكريات الجميلة 💖</p>
+            <div class="flex justify-center space-x-4 space-x-reverse mt-6">
+                <span class="text-2xl heart-float">🌹</span>
+                <span class="text-2xl heart-float" style="animation-delay: 1s;">💝</span>
+                <span class="text-2xl heart-float" style="animation-delay: 2s;">🌹</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-center">
+                <button class="nav-btn px-8 py-3 rounded-full bg-pink-500 text-white font-medium transition-all hover:bg-pink-600 shadow-lg">
+                    💕 معرض الصور الجميلة
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Add Image Section -->
+    <section class="bg-gradient-to-br from-pink-50 to-rose-50 py-12 border-b rose-pattern">
+        <div class="container mx-auto px-6">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-8">
+                    <div class="text-4xl mb-4">💕</div>
+                    <h2 class="text-3xl font-bold text-pink-800 mb-2">إضافة ذكرى جميلة</h2>
+                    <p class="text-pink-600">شاركي لحظاتك الخاصة مع العالم 🌹</p>
+                </div>
+                
+                <form id="addImageForm" class="bg-white rounded-lg p-6 shadow-lg border border-pink-200">
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium mb-2">رفع الصورة</label>
+                        <div class="border-2 border-dashed border-pink-300 rounded-lg p-8 text-center hover:border-pink-400 transition-colors bg-gradient-to-br from-pink-50 to-rose-50">
+                            <input type="file" id="imageInput" accept="image/*" multiple class="hidden" onchange="handleMultipleImageUpload(event)">
+                            <div id="uploadArea" onclick="document.getElementById('imageInput').click()" class="cursor-pointer">
+                                <div class="text-4xl mb-4">💖</div>
+                                <svg class="w-12 h-12 text-pink-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="text-pink-600 font-medium">انقري لاختيار صورك الجميلة 🌹</p>
+                                <p class="text-sm text-pink-400 mt-2">يمكنك اختيار عدة صور معاً - PNG, JPG, GIF حتى 10MB لكل صورة</p>
+                            </div>
+                            <div id="imagePreview" class="hidden mt-4">
+                                <div class="text-center mb-4">
+                                    <p class="text-pink-600 font-medium">الصور المختارة:</p>
+                                </div>
+                                <div id="previewContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-64 overflow-y-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="imageCategory" class="block text-pink-700 font-medium mb-2">🌹 نوع الذكرى</label>
+                        <select id="imageCategory" class="w-full px-4 py-2 border border-pink-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                            <option value="nature">🌹 الطبيعة الرومانسية</option>
+                            <option value="portraits">💖 لحظات خاصة</option>
+                            <option value="abstract">💝 فن الحب</option>
+                        </select>
+                    </div>
+                    
+                    <div class="bg-pink-50 border border-pink-200 rounded-lg p-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">✨</div>
+                            <p class="text-pink-700 font-medium">سيتم إنشاء عناوين وأوصاف رومانسية تلقائياً لكل صورة 💕</p>
+                            <p class="text-pink-600 text-sm mt-1">لا حاجة لكتابة أي شيء - دعي السحر يحدث! 🌹</p>
+                        </div>
+                    </div>
+                    
+
+                    
+                    <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-3 px-6 rounded-lg font-medium hover:from-pink-600 hover:to-rose-600 transition-all transform hover:scale-105 shadow-lg">
+                        💖 إضافة الذكريات الجميلة
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery -->
+    <main class="container mx-auto px-6 py-12">
+        <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Empty gallery - images will be added when uploaded -->
+            <div id="emptyGallery" class="col-span-full text-center py-16">
+                <div class="text-6xl mb-6">💕</div>
+                <h3 class="text-2xl font-bold text-pink-800 mb-4">معرضك فارغ حالياً</h3>
+                <p class="text-pink-600 mb-6">ابدئي بإضافة صورك الجميلة لإنشاء معرض ذكرياتك الخاص 🌹</p>
+                <div class="flex justify-center space-x-4 space-x-reverse">
+                    <span class="text-2xl heart-float">🌸</span>
+                    <span class="text-2xl heart-float" style="animation-delay: 1s;">💖</span>
+                    <span class="text-2xl heart-float" style="animation-delay: 2s;">🌹</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 modal hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-4xl max-h-full overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="modalTitle" class="text-xl font-semibold text-gray-800"></h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="p-4">
+                <div id="modalImage" class="w-full h-96 rounded-lg mb-4"></div>
+                <p id="modalDescription" class="text-gray-600"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-12 mt-16 rose-pattern">
+        <div class="container mx-auto px-6 text-center">
+            <div class="text-4xl mb-4 heart-float">💕</div>
+            <h2 class="text-3xl font-bold mb-4 text-pink-800">ZOZA</h2>
+            <p class="opacity-90 mb-6 text-pink-700">💖 معرض الذكريات الجميلة والأحلام الوردية 💖</p>
+            <div class="flex justify-center space-x-8 space-x-reverse mb-6">
+                <a href="#" class="hover:text-pink-200 transition-colors transform hover:scale-110">💌 راسليني</a>
+                <a href="#" class="hover:text-pink-200 transition-colors transform hover:scale-110">🌹 تواصلي معي</a>
+                <a href="#" class="hover:text-pink-200 transition-colors transform hover:scale-110">💝 زوري موقعي</a>
+            </div>
+            <div class="flex justify-center space-x-4 space-x-reverse">
+                <span class="text-2xl heart-float">🌹</span>
+                <span class="text-2xl heart-float" style="animation-delay: 1s;">💖</span>
+                <span class="text-2xl heart-float" style="animation-delay: 2s;">🌸</span>
+                <span class="text-2xl heart-float" style="animation-delay: 3s;">💕</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let images = [];
+
+        // Compress image to reduce storage size
+        function compressImage(file, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    // Calculate new dimensions
+                    let { width, height } = img;
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw and compress
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve(compressedDataUrl);
+                };
+                
+                img.src = file;
+            });
+        }
+
+        // Load saved images with chunked loading for better performance
+        function loadSavedImages() {
+            try {
+                // Load images count first
+                const imageCount = localStorage.getItem('zoza_gallery_count');
+                if (!imageCount || imageCount === '0') {
+                    return;
+                }
+                
+                const count = parseInt(imageCount);
+                images = [];
+                
+                // Load images in chunks
+                for (let i = 0; i < count; i++) {
+                    const imageData = localStorage.getItem(`zoza_image_${i}`);
+                    if (imageData) {
+                        try {
+                            const image = JSON.parse(imageData);
+                            images.push(image);
+                        } catch (error) {
+                            console.error(`خطأ في تحميل الصورة ${i}:`, error);
+                        }
+                    }
+                }
+                
+                const emptyGallery = document.getElementById('emptyGallery');
+                if (images.length > 0) {
+                    if (emptyGallery) {
+                        emptyGallery.style.display = 'none';
+                    }
+                    
+                    // Load images progressively for better performance
+                    loadImagesProgressively();
+                    showSuccessMessage(`تم استرجاع ${images.length} صورة محفوظة! 💕`);
+                }
+                
+            } catch (error) {
+                console.error('خطأ في تحميل الصور المحفوظة:', error);
+                images = [];
+                showErrorMessage('حدث خطأ في تحميل الصور المحفوظة');
+            }
+        }
+
+        // Load images progressively to avoid blocking UI
+        function loadImagesProgressively() {
+            const batchSize = 20;
+            let currentIndex = 0;
+            
+            function loadBatch() {
+                const endIndex = Math.min(currentIndex + batchSize, images.length);
+                
+                for (let i = currentIndex; i < endIndex; i++) {
+                    addImageToGalleryDOM(images[i], i);
+                }
+                
+                currentIndex = endIndex;
+                
+                if (currentIndex < images.length) {
+                    setTimeout(loadBatch, 100); // Small delay between batches
+                }
+            }
+            
+            loadBatch();
+        }
+
+        // Save images with chunked storage for better performance and capacity
+        function saveImages() {
+            try {
+                // Clear old storage first
+                clearOldImageStorage();
+                
+                // Save each image separately
+                for (let i = 0; i < images.length; i++) {
+                    const imageKey = `zoza_image_${i}`;
+                    localStorage.setItem(imageKey, JSON.stringify(images[i]));
+                }
+                
+                // Save total count
+                localStorage.setItem('zoza_gallery_count', images.length.toString());
+                
+                console.log(`تم حفظ ${images.length} صورة بنجاح`);
+                return true;
+                
+            } catch (error) {
+                console.error('خطأ في حفظ الصور:', error);
+                
+                // Try to free up space and retry
+                if (error.name === 'QuotaExceededError') {
+                    try {
+                        // Remove oldest images if storage is full
+                        const imagesToRemove = Math.min(50, Math.floor(images.length * 0.1));
+                        images.splice(0, imagesToRemove);
+                        
+                        // Try saving again
+                        clearOldImageStorage();
+                        for (let i = 0; i < images.length; i++) {
+                            localStorage.setItem(`zoza_image_${i}`, JSON.stringify(images[i]));
+                        }
+                        localStorage.setItem('zoza_gallery_count', images.length.toString());
+                        
+                        showErrorMessage(`تم حذف ${imagesToRemove} صورة قديمة لتوفير مساحة`);
+                        return true;
+                        
+                    } catch (retryError) {
+                        showErrorMessage('مساحة التخزين ممتلئة - يرجى حذف بعض الصور');
+                        return false;
+                    }
+                } else {
+                    showErrorMessage('حدث خطأ في حفظ الصور');
+                    return false;
+                }
+            }
+        }
+
+        // Clear old image storage
+        function clearOldImageStorage() {
+            const oldCount = localStorage.getItem('zoza_gallery_count');
+            if (oldCount) {
+                const count = parseInt(oldCount);
+                for (let i = 0; i < count; i++) {
+                    localStorage.removeItem(`zoza_image_${i}`);
+                }
+            }
+            // Also remove old format if exists
+            localStorage.removeItem('zoza_gallery_images');
+        }
+
+        // Get storage usage info
+        function getStorageInfo() {
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (key.startsWith('zoza_')) {
+                    totalSize += localStorage[key].length;
+                }
+            }
+            
+            const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+            const maxSizeMB = 10; // Approximate localStorage limit
+            const usagePercent = ((totalSize / (maxSizeMB * 1024 * 1024)) * 100).toFixed(1);
+            
+            return {
+                totalSizeMB,
+                usagePercent,
+                imageCount: images.length
+            };
+        }
+
+        // Auto-save when page is about to close
+        window.addEventListener('beforeunload', function(e) {
+            if (images.length > 0) {
+                saveImages();
+            }
+        });
+
+        // Auto-save when page loses focus
+        window.addEventListener('blur', function() {
+            if (images.length > 0) {
+                saveImages();
+            }
+        });
+
+        // Auto-save periodically (every 30 seconds)
+        setInterval(function() {
+            if (images.length > 0) {
+                saveImages();
+            }
+        }, 30000);
+
+        // Update storage info display (hidden)
+        function updateStorageInfo() {
+            // Storage info is now hidden but functionality remains
+            const info = getStorageInfo();
+            console.log(`عدد الصور: ${info.imageCount}, المساحة المستخدمة: ${info.totalSizeMB} MB`);
+        }
+
+        // Load images when page loads
+        window.addEventListener('load', function() {
+            loadSavedImages();
+        });
+
+        async function handleMultipleImageUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length > 0) {
+                const imagePreview = document.getElementById('imagePreview');
+                const previewContainer = document.getElementById('previewContainer');
+                
+                // Clear previous previews
+                previewContainer.innerHTML = '';
+                window.uploadedImagesData = [];
+                
+                imagePreview.classList.remove('hidden');
+                
+                // Show loading message
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'text-center text-pink-600 mb-4';
+                loadingDiv.innerHTML = '⏳ جاري ضغط الصور لتوفير المساحة...';
+                previewContainer.appendChild(loadingDiv);
+                
+                // Process files with compression
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    
+                    try {
+                        const reader = new FileReader();
+                        reader.onload = async function(e) {
+                            // Compress the image
+                            const compressedImage = await compressImage(e.target.result);
+                            
+                            // Store compressed image data
+                            window.uploadedImagesData.push(compressedImage);
+                            
+                            // Remove loading message if this is the first image
+                            if (window.uploadedImagesData.length === 1) {
+                                loadingDiv.remove();
+                            }
+                            
+                            // Create preview element
+                            const previewDiv = document.createElement('div');
+                            previewDiv.className = 'relative group';
+                            previewDiv.innerHTML = `
+                                <img src="${compressedImage}" class="w-full h-24 object-cover rounded-lg border border-pink-200">
+                                <button onclick="removeImage(${window.uploadedImagesData.length - 1})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                                <div class="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-1 rounded">مضغوطة</div>
+                            `;
+                            previewContainer.appendChild(previewDiv);
+                        };
+                        reader.readAsDataURL(file);
+                        
+                    } catch (error) {
+                        console.error('خطأ في ضغط الصورة:', error);
+                        showErrorMessage(`خطأ في معالجة الصورة ${i + 1}`);
+                    }
+                }
+            }
+        }
+
+        function removeImage(index) {
+            if (window.uploadedImagesData) {
+                window.uploadedImagesData.splice(index, 1);
+                
+                // Refresh preview
+                const previewContainer = document.getElementById('previewContainer');
+                previewContainer.innerHTML = '';
+                
+                window.uploadedImagesData.forEach((imageData, newIndex) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'relative group';
+                    previewDiv.innerHTML = `
+                        <img src="${imageData}" class="w-full h-24 object-cover rounded-lg border border-pink-200">
+                        <button onclick="removeImage(${newIndex})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                    `;
+                    previewContainer.appendChild(previewDiv);
+                });
+                
+                if (window.uploadedImagesData.length === 0) {
+                    document.getElementById('imagePreview').classList.add('hidden');
+                }
+            }
+        }
+
+        // Romantic titles and descriptions for auto-generation
+        const romanticTitles = {
+            nature: [
+                "🌹 حديقة الأحلام الوردية", "🌸 بستان العشاق", "🌺 زهور الحب الأبدي", 
+                "🌷 ربيع القلوب", "🌻 شمس الرومانسية", "🍃 نسيم الذكريات", 
+                "🌙 ليلة تحت النجوم", "🌊 موج الأحاسيس", "🦋 رقصة الفراشات"
+            ],
+            portraits: [
+                "💖 لحظة من ذهب", "💕 ابتسامة تسرق القلوب", "💝 ذكرى لا تُنسى", 
+                "💗 قلب ينبض بالحب", "💘 نظرة تحكي الحكايات", "💞 أجمل اللحظات", 
+                "💓 دقات قلب عاشق", "💌 رسالة حب صامتة", "👑 ملكة الجمال"
+            ],
+            abstract: [
+                "🎨 لوحة من المشاعر", "✨ سحر الألوان", "🌈 قوس قزح الأحلام", 
+                "🎭 فن يحكي القصص", "🖼️ تحفة فنية رائعة", "🎪 عالم من الخيال", 
+                "🎨 إبداع بلا حدود", "🌟 نجمة في سماء الفن", "🎀 جمال أخاذ"
+            ]
+        };
+
+        const romanticDescriptions = {
+            nature: [
+                "💕 في هذا المكان السحري، تتراقص أوراق الشجر كعاشقين في ليلة قمرية، وتهمس الرياح بأجمل قصائد الحب الأبدي التي تملأ القلب بالدفء والحنان",
+                "🌹 منظر يأسر الروح ويسكن القلب، حيث تتعانق الألوان في لوحة إلهية تحكي حكاية حب خالدة بين السماء والأرض، وكأن الطبيعة تغني أعذب الألحان",
+                "💖 لحظة سحرية تجمع بين جمال الخلق وروعة الإبداع، حيث كل زهرة تحمل رسالة حب، وكل شعاع شمس يداعب الأرض بحنان الأم العاشقة لأطفالها",
+                "🌸 في أحضان هذا الجمال الطبيعي، تتوقف الساعات وتصمت الدنيا لتستمع إلى همسات العشق التي تتردد بين الأشجار والورود في سيمفونية حب أبدية",
+                "💝 مشهد يحبس الأنفاس ويجعل القلب يرقص طرباً، حيث تتجلى قدرة الخالق في كل تفصيلة، وكأن الطبيعة ترسم لوحة حب بأنامل من نور وعطر الياسمين",
+                "🦋 في هذا المكان الساحر، تتراقص الفراشات كأرواح العاشقين، وتتمايل الأزهار مع نسيم الصباح في رقصة حب تأخذ الألباب وتسحر العقول والقلوب",
+                "🌺 منظر يجمع بين سحر الطبيعة وجمال الروح، حيث كل ورقة شجر تحمل قصة حب، وكل قطرة ندى تعكس بريق الأمل والحب الصادق في عيون المحبين",
+                "💞 لحظة تتجلى فيها عظمة الخالق وجمال الحياة، حيث تتعانق الأرض والسماء في قبلة حب أبدية، وتغرد الطيور أعذب الألحان احتفالاً بهذا الجمال الأخاذ"
+            ],
+            portraits: [
+                "💖 في هذه النظرة السحرية، تكمن حكايات ألف ليلة وليلة من الحب والشوق، وكأن العيون تتكلم بلغة القلوب وتحكي أجمل قصص العشق الأبدي",
+                "🌹 ابتسامة تضيء الكون وتملأ القلب بالفرح، كشعاع شمس يخترق ظلام الليل ليبعث الأمل والحب في كل زاوية من زوايا الروح العاشقة",
+                "💕 لحظة تحبس الأنفاس وتجعل الزمن يتوقف، حيث تتجلى روعة الجمال الإنساني في أبهى صوره، وكأن الملائكة نزلت من السماء لتبارك هذه اللحظة الخالدة",
+                "💝 في هذه الصورة الجميلة، تتراقص المشاعر كأوتار العود في يد عازف ماهر، وتحكي حكاية حب صادقة تدوم إلى الأبد في قلوب المحبين",
+                "🌸 نظرة تحمل في طياتها كل معاني الحب والحنان، وكأن القلب يتكلم من خلال العيون ليقول أجمل كلمات الغزل والعشق بلا صوت ولا كلام",
+                "💞 لحظة سحرية تجمع بين جمال الروح وبراءة القلب، حيث تشع الأنوار من الوجه الجميل لتضيء طريق الحب والأمل في قلوب كل من يراها",
+                "👑 في هذه الصورة الملكية، تتجلى عظمة الجمال الإنساني وروعة الخلق، وكأن الله سبحانه وتعالى أراد أن يظهر للعالم تحفة فنية من صنع يديه الكريمتين",
+                "💗 ابتسامة تذيب القلوب وتجعل الأرواح ترقص طرباً، كنغمة موسيقية عذبة تتردد في أرجاء الكون لتبعث السعادة والحب في كل مكان"
+            ],
+            abstract: [
+                "🎨 لوحة فنية تحكي قصة حب بألوان قوس قزح، حيث تتراقص الخطوط والأشكال في رقصة سحرية تأخذ المشاهد إلى عالم من الأحلام والخيال الجميل",
+                "💖 إبداع فني يجسد لغة القلوب العاشقة، حيث كل لون يحمل رسالة حب، وكل خط يرسم حكاية عشق، وكل شكل يحكي قصة رومانسية خالدة",
+                "🌈 تحفة فنية تتجلى فيها روعة الإبداع الإنساني، وكأن الفنان استخدم ريشته ليرسم مشاعر الحب والشوق على قماش من الأحلام الوردية",
+                "✨ عمل فني ساحر يجمع بين جمال الألوان وسحر التكوين، ليحكي حكاية حب صامتة تتكلم بلغة الفن والجمال إلى أعماق القلوب المحبة",
+                "💝 لوحة تنبض بالحياة والحب، حيث تتعانق الألوان في تناغم بديع يذكرنا بجمال الحب الصادق وروعة المشاعر النبيلة التي تسكن القلوب الطاهرة",
+                "🎭 إبداع فني يحكي قصة بلا كلمات، حيث تتحدث الألوان والأشكال بلغة العشاق، وتنقل المشاعر الجميلة من قلب الفنان إلى قلب كل من يتأمل هذا الجمال",
+                "🌟 تحفة فنية تشع بنور الحب والجمال، وكأن النجوم نزلت من السماء لترقص على هذه اللوحة الساحرة وتملأها بالسحر والرومانسية الأبدية",
+                "💕 عمل فني يجسد روح الحب في أبهى صوره، حيث تتراقص الألوان كعاشقين في ليلة قمرية، وتحكي حكاية جميلة عن قوة الحب وسحر الفن الأبدي"
+            ]
+        };
+
+        function getRandomTitle(category) {
+            const titles = romanticTitles[category];
+            return titles[Math.floor(Math.random() * titles.length)];
+        }
+
+        function getRandomDescription(category) {
+            const descriptions = romanticDescriptions[category];
+            return descriptions[Math.floor(Math.random() * descriptions.length)];
+        }
+
+        // Handle form submission
+        document.getElementById('addImageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const category = document.getElementById('imageCategory').value;
+            const imagesData = window.uploadedImagesData;
+            
+            if (!imagesData || imagesData.length === 0) {
+                alert('يرجى اختيار صورة واحدة على الأقل');
+                return;
+            }
+            
+            // Add each image to the array with auto-generated titles and descriptions
+            imagesData.forEach((imageData, index) => {
+                const newImage = {
+                    title: getRandomTitle(category),
+                    description: getRandomDescription(category),
+                    category: category,
+                    imageData: imageData,
+                    type: "uploaded"
+                };
+                
+                images.push(newImage);
+                addImageToGallery(newImage, images.length - 1);
+            });
+            
+            // Save images to localStorage with feedback
+            const saveSuccess = saveImages();
+            
+            // Reset form
+            document.getElementById('addImageForm').reset();
+            document.getElementById('imagePreview').classList.add('hidden');
+            window.uploadedImagesData = [];
+            
+            // Show success message
+            const count = imagesData.length;
+            if (saveSuccess) {
+                showSuccessMessage(`تم إضافة وحفظ ${count} ${count === 1 ? 'صورة مضغوطة' : 'صور مضغوطة'} بنجاح! ستبقى محفوظة دائماً 💕`);
+            } else {
+                showErrorMessage(`تم إضافة الصور لكن حدث خطأ في الحفظ الدائم`);
+            }
+            
+            // Scroll to gallery
+            document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        function addImageToGallery(image, index) {
+            const emptyGallery = document.getElementById('emptyGallery');
+            
+            // Hide empty gallery message when first image is added
+            if (emptyGallery && images.length === 1) {
+                emptyGallery.style.display = 'none';
+            }
+            
+            addImageToGalleryDOM(image, index);
+        }
+
+        function addImageToGalleryDOM(image, index) {
+            const gallery = document.getElementById('gallery');
+            
+            const galleryItem = document.createElement('div');
+            galleryItem.className = `gallery-item ${image.category} bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer fade-in border border-pink-200`;
+            galleryItem.onclick = () => openModal(index);
+            
+            let imageContent;
+            if (image.type === "uploaded") {
+                imageContent = `<img src="${image.imageData}" alt="${image.title}" class="w-full h-64 object-cover">`;
+            } else {
+                imageContent = `
+                    <div class="h-64 bg-gradient-to-br ${image.gradient} flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                `;
+            }
+            
+            galleryItem.innerHTML = `
+                ${imageContent}
+                <div class="p-4">
+                    <h3 class="font-semibold text-pink-800">${image.title}</h3>
+                    <p class="text-pink-600 text-sm mt-1">${image.description}</p>
+                </div>
+            `;
+            
+            gallery.appendChild(galleryItem);
+        }
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 fade-in';
+            successDiv.textContent = message;
+            
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 fade-in';
+            errorDiv.textContent = message;
+            
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 4000);
+        }
+
+
+
+        function openModal(index) {
+            const modal = document.getElementById('imageModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalImage = document.getElementById('modalImage');
+            const modalDescription = document.getElementById('modalDescription');
+            
+            const image = images[index];
+            
+            modalTitle.textContent = image.title;
+            modalDescription.textContent = image.description;
+            
+            modalImage.className = `w-full h-96 rounded-lg mb-4 flex items-center justify-center bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200`;
+            modalImage.innerHTML = `<img src="${image.imageData}" alt="${image.title}" class="max-w-full max-h-full object-contain rounded-lg shadow-lg">`;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98634df951074731',t:'MTc1OTA2MzE3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
